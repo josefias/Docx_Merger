@@ -12,38 +12,47 @@ namespace Doc_Merger
         static void Main(string[] args)
         {
             killAllWordProcess();
-            string allFilePath = @"C:\Users\jppirespereira\Desktop\Word-Doc-Merger\parte2\pt1";
-            string finalPath = @"C:\Users\jppirespereira\Desktop\Word-Doc-Merger\FinalReport_pt1.docx";
-            string errorLogPath = @"C:\Users\jppirespereira\Desktop\Word-Doc-Merger\errorlog.txt";
+            string[] allFilePath = { @"C:\Users\altavares\Documents\Varian\Docs\sonar result\original\pt3", @"C:\Users\altavares\Documents\Varian\Docs\sonar result\original\pt4" };
+            string[] finalPath = { @"C:\Users\altavares\Documents\Varian\Docs\sonar result\FinalReport3.docx", @"C:\Users\altavares\Documents\Varian\Docs\sonar result\FinalReport4.docx" };
+            string[] errorLogPath = { @"C:\Users\altavares\Documents\Varian\Docs\sonar result\errorlog3.txt", @"C:\Users\altavares\Documents\Varian\Docs\sonar result\errorlog4.txt" };
+
+            var t1 = new Thread(new ThreadStart(() => startup(allFilePath[0], finalPath[0], errorLogPath[0])));
+            var t2 = new Thread(new ThreadStart(() => startup(allFilePath[1], finalPath[1], errorLogPath[1])));
+
+            t1.Start();
+            t2.Start();
+        }
+
+        private static void startup(string allFilesPath, string finalPath, string errorLogPath)
+        {
             var app = new Application();
-            var files = Directory.GetFiles(allFilePath, "*.docx");
-            
+            var files = Directory.GetFiles(allFilesPath, "*.docx");
             CreateFileIfNotExist(errorLogPath);
             CreateFileIfNotExist(finalPath);
+
             var finalFile = app.Documents.Open(finalPath);
             var count = 1;
             finalFile.PageSetup.Orientation = WdOrientation.wdOrientLandscape;
             files.ToList().ForEach(file =>
             {
-
                 try
                 {
                     finalFile.ActiveWindow.Selection.InsertFile(file);
                     finalFile.Save();
                     Console.WriteLine($"{count} - {file}\n");
                 }
-                catch(System.Runtime.InteropServices.COMException)
+                catch (System.Runtime.InteropServices.COMException)
                 {
-                    using (StreamWriter writer = File.CreateText(errorLogPath)) 
-                    { 
+                    using (StreamWriter writer = File.CreateText(errorLogPath))
+                    {
                         writer.WriteLine($"{count} - {file}\n");
                     }
                 }
                 count++;
-                
+
 
             });
-           
+
             finalFile.Close();
             app.Quit();
         }
