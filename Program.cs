@@ -12,15 +12,39 @@ namespace Doc_Merger
         static void Main(string[] args)
         {
             killAllWordProcess();
-            string[] allFilePath = { @"C:\Users\altavares\Documents\Varian\Docs\sonar result\original\pt3", @"C:\Users\altavares\Documents\Varian\Docs\sonar result\original\pt4" };
-            string[] finalPath = { @"C:\Users\altavares\Documents\Varian\Docs\sonar result\FinalReport3.docx", @"C:\Users\altavares\Documents\Varian\Docs\sonar result\FinalReport4.docx" };
-            string[] errorLogPath = { @"C:\Users\altavares\Documents\Varian\Docs\sonar result\errorlog3.txt", @"C:\Users\altavares\Documents\Varian\Docs\sonar result\errorlog4.txt" };
+            Paths paths = new Paths();
+            List<string> allFilesPath = default;
+            if (args.Length > 0)
+                allFilesPath.AddRange(args);
+
+            paths.AllFilePath.AddRange(allFilesPath);
+            string currentDir = Directory.GetCurrentDirectory();
+            string finalPath = currentDir + @"\Results";
+            string finalFile = finalPath + @"\Completed\Result.docx";
+            string errorFile = finalPath + @"\Errors\errors.txt";
+            ValidatePaths(currentDir, finalPath, finalFile, errorFile);
 
             var t1 = new Thread(new ThreadStart(() => startup(allFilePath[0], finalPath[0], errorLogPath[0])));
             var t2 = new Thread(new ThreadStart(() => startup(allFilePath[1], finalPath[1], errorLogPath[1])));
 
             t1.Start();
             t2.Start();
+        }
+
+        private static void ValidatePaths(string currentDir, string finalPath, string finalFile, string errorFile)
+        {
+            if (!Directory.Exists($"{ currentDir }\\Results"))
+                Directory.CreateDirectory($"{currentDir}\\Results");
+
+            if (!Directory.Exists($"{ finalPath }\\Completed"))
+                Directory.CreateDirectory($"{finalPath}\\Completed");
+            if (!Directory.Exists($"{ finalPath }\\Errors"))
+                Directory.CreateDirectory($"{finalPath}\\Errors");
+
+            if (!File.Exists(finalFile))
+                File.Create(finalFile);
+            if (!File.Exists(errorFile))
+                File.Create(errorFile);
         }
 
         private static void startup(string allFilesPath, string finalPath, string errorLogPath)
