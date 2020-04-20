@@ -12,15 +12,23 @@ namespace Doc_Merger
         static void Main(string[] args)
         {
             killAllWordProcess();
-            string[] allFilePath = { @"C:\Users\altavares\Documents\Varian\Docs\sonar result\original\pt3", @"C:\Users\altavares\Documents\Varian\Docs\sonar result\original\pt4" };
-            string[] finalPath = { @"C:\Users\altavares\Documents\Varian\Docs\sonar result\FinalReport3.docx", @"C:\Users\altavares\Documents\Varian\Docs\sonar result\FinalReport4.docx" };
-            string[] errorLogPath = { @"C:\Users\altavares\Documents\Varian\Docs\sonar result\errorlog3.txt", @"C:\Users\altavares\Documents\Varian\Docs\sonar result\errorlog4.txt" };
+            string allFilePath = @"C:\Users\jppirespereira\Desktop\FinalReport.docx";
+            string finalPath = @"C:\Users\jppirespereira\Desktop\FinalReport.pdf";
+        
+            //CreateFileIfNotExist(finalPath);
 
-            var t1 = new Thread(new ThreadStart(() => startup(allFilePath[0], finalPath[0], errorLogPath[0])));
-            var t2 = new Thread(new ThreadStart(() => startup(allFilePath[1], finalPath[1], errorLogPath[1])));
+            var app = new Application();
+            Console.WriteLine("opening docx\n");
+            var finalFile = app.Documents.Open(allFilePath);
+            Console.WriteLine("opened docx\nSaving as PDF\n");
+            finalFile.SaveAs(finalPath, WdSaveFormat.wdFormatPDF);
+            Console.WriteLine("PDF created");
+            finalFile.Close();
+            app.Quit();
+            Console.WriteLine("Done");
+            Console.ReadKey();
 
-            t1.Start();
-            t2.Start();
+
         }
 
         private static void startup(string allFilesPath, string finalPath, string errorLogPath)
